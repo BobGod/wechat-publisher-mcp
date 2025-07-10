@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "微信公众号自动发布MCP服务 - 支持任何AI工具调用，实现智能内容发布",
   "main": "src/index.js",
-  "type": "commonjs",
+  "type": "module",
   "bin": {
     "wechat-publisher-mcp": "src/server.js"
   },
@@ -15,21 +15,19 @@
     "test:watch": "jest --watch",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "build": "npm run lint && npm test",
-    "prepare": "npm run build"
+    "build": "npm run lint && npm test"
   },
   "keywords": [
     "mcp",
     "wechat",
-    "weixin", 
+    "weixin",
     "publisher",
     "ai-tools",
     "claude",
     "cursor",
     "automation",
     "content-publishing",
-    "markdown",
-    "social-media"
+    "markdown"
   ],
   "author": {
     "name": "Deepractice",
@@ -45,31 +43,14 @@
     "url": "https://github.com/Deepractice/PromptX/issues"
   },
   "homepage": "https://github.com/Deepractice/PromptX#readme",
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "axios": "^1.6.0",
+    "@modelcontextprotocol/sdk": "latest",
     "express": "^4.18.2",
-    "form-data": "^4.0.0",
-    "marked": "^11.1.0",
-    "zod": "^3.22.0"
+    "winston": "^3.11.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "jest": "^29.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-n": "^16.0.0",
-    "eslint-plugin-promise": "^6.1.0"
-  },
-  "files": [
-    "src/",
-    "README.md",
-    "LICENSE"
-  ],
-  "publishConfig": {
-    "access": "public"
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
   }
-} 
+}
