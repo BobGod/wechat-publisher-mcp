@@ -1,0 +1,71 @@
+{
+  "name": "wechat-publisher-mcp",
+  "version": "1.0.0",
+  "description": "微信公众号自动发布MCP服务 - 支持任何AI工具调用，实现智能内容发布",
+  "main": "src/index.js",
+  "bin": {
+    "wechat-publisher-mcp": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --inspect src/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "build": "npm run lint && npm test",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "wechat",
+    "weixin", 
+    "publisher",
+    "ai-tools",
+    "claude",
+    "cursor",
+    "automation",
+    "content-publishing",
+    "markdown",
+    "social-media"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://github.com/your-username"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/wechat-publisher-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/wechat-publisher-mcp/issues"
+  },
+  "homepage": "https://github.com/your-username/wechat-publisher-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.0.0",
+    "eslint-plugin-promise": "^6.1.0"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+} 
