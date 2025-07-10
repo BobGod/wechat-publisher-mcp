@@ -307,7 +307,7 @@ npm run test:coverage
 
 感谢以下项目和社区的支持：
 
-- [PromptX项目](https://github.com/your-username/PromptX) - 原始灵感来源
+- [PromptX项目](https://github.com/Deepractice/PromptX) - 原始灵感来源
 - [Model Context Protocol](https://modelcontextprotocol.io/) - 协议支持
 - 微信开发者社区 - API支持
 
