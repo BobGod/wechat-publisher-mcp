@@ -36,12 +36,13 @@ class WeChatStatus {
 
       const executionTime = Date.now() - startTime;
       logger.info('状态查询成功', { 
-        ...statusData, 
+        msgId,
+        status: statusData.publish_status,
         executionTime: `${executionTime}ms` 
       });
 
       // 4. 构建成功响应
-      const successMessage = this.buildStatusMessage(statusData, executionTime);
+      const successMessage = this.buildStatusMessage(statusData, executionTime, msgId);
 
       return {
         content: [{
@@ -53,6 +54,7 @@ class WeChatStatus {
     } catch (error) {
       const executionTime = Date.now() - startTime;
       logger.error('状态查询失败', {
+        msgId: params.msgId,
         error: error.message,
         executionTime: `${executionTime}ms`,
         stack: error.stack
@@ -71,44 +73,57 @@ class WeChatStatus {
   /**
    * 构建状态响应消息
    */
-  static buildStatusMessage(statusData, executionTime) {
-    let message = `📊 微信公众号文章状态查询\n\n`;
+  static buildStatusMessage(statusData, executionTime, msgId) {
+    let message = `📊 文章状态查询结果\n\n`;
     
-    // 基本信息
-    if (statusData.article_id) {
-      message += `🆔 文章ID: ${statusData.article_id}\n`;
-    }
-    
-    if (statusData.article_detail) {
-      const detail = statusData.article_detail;
-      message += `📱 标题: ${detail.title || '未知'}\n`;
-      message += `👤 作者: ${detail.author || '未知'}\n`;
-      message += `📅 发布时间: ${this.formatTimestamp(detail.publish_time)}\n`;
-    }
+    // 处理微信API的真实响应格式
+    message += `📨 消息ID: ${msgId || '未知'}\n`;
     
     // 发布状态
     if (statusData.publish_status !== undefined) {
       const statusText = this.getStatusText(statusData.publish_status);
-      message += `📈 发布状态: ${statusText}\n`;
+      message += `📈 状态: ${statusText}\n`;
     }
     
-    // 统计数据
-    if (statusData.article_detail && statusData.article_detail.stat_info) {
-      const stat = statusData.article_detail.stat_info;
-      message += `\n📊 数据统计:\n`;
-      message += `👀 阅读量: ${stat.read_num || 0}\n`;
-      message += `👍 点赞数: ${stat.like_num || 0}\n`;
-      message += `💬 评论数: ${stat.comment_num || 0}\n`;
-      message += `📤 分享数: ${stat.share_num || 0}\n`;
+    // 处理文章详情（微信API返回的格式）
+    if (statusData.article_detail && statusData.article_detail.item && statusData.article_detail.item.length > 0) {
+      const article = statusData.article_detail.item[0];
+      
+      if (article.title) {
+        message += `📱 标题: ${article.title}\n`;
+      }
+      
+      if (article.author) {
+        message += `👤 作者: ${article.author}\n`;
+      }
+      
+      if (article.publish_time) {
+        message += `📅 发布时间: ${this.formatTimestamp(article.publish_time)}\n`;
+      }
+      
+      // 统计数据
+      if (article.stat_info) {
+        const stat = article.stat_info;
+        message += `👀 阅读量: ${stat.read_num || 0}\n`;
+        message += `❤️ 点赞数: ${stat.like_num || 0}\n`;
+        
+        // 只有当有评论或分享数据时才显示
+        if (stat.comment_num > 0) {
+          message += `💬 评论数: ${stat.comment_num}\n`;
+        }
+        if (stat.share_num > 0) {
+          message += `📤 分享数: ${stat.share_num}\n`;
+        }
+      }
+      
+      // 文章链接
+      if (article.url) {
+        message += `🔗 文章链接: ${article.url}\n`;
+      }
+    } else {
+      // 如果没有文章详情，可能是刚发布还未生成统计数据
+      message += `ℹ️ 文章详情暂未生成，可能需要等待几分钟后重试\n`;
     }
-    
-    // 链接信息
-    if (statusData.article_detail && statusData.article_detail.url) {
-      message += `🔗 文章链接: ${statusData.article_detail.url}\n`;
-    }
-    
-    message += `⏱️ 查询时间: ${executionTime}ms\n`;
-    message += `\n✅ 状态查询完成！数据已为您整理如上。`;
     
     return message;
   }

@@ -390,9 +390,11 @@ class WeChatAPI {
    * @returns {Promise<Object>} 状态信息
    */
   async getPublishStatus(msgId) {
-    // 检查是否为测试模式的msgId（只对明确的测试ID返回模拟数据）
+    logger.info('开始查询发布状态', { msgId, appId: this.appId });
+    
+    // 检查是否为明确的测试模式（只有以test_开头的msgId才使用模拟数据）
     if (msgId && msgId.toString().startsWith('test_')) {
-      logger.info('测试模式：返回模拟状态数据');
+      logger.info('测试模式：返回模拟状态数据', { msgId });
       return {
         errcode: 0,
         errmsg: 'ok',
@@ -401,44 +403,77 @@ class WeChatAPI {
           count: 1,
           item: [{
             article_id: msgId,
-            title: '🚀 AI时代的内容创作革命：微信公众号自动发布MCP服务深度解析',
-            author: '郑伟 | PromptX技术',
-            digest: 'AI工具日益普及的今天，如何让AI助手直接帮我们发布微信公众号文章？',
+            title: '测试文章标题',
+            author: '测试作者',
+            digest: '这是一篇测试文章',
             content: '',
             content_source_url: '',
-            url: `https://mp.weixin.qq.com/s/example_${msgId}`,
+            url: `https://mp.weixin.qq.com/s/test_${msgId}`,
             publish_time: Math.floor(Date.now() / 1000),
             stat_info: {
-              read_num: Math.floor(Math.random() * 500) + 200,
-              like_num: Math.floor(Math.random() * 100) + 30,
-              comment_num: Math.floor(Math.random() * 20) + 5,
-              share_num: Math.floor(Math.random() * 50) + 10
+              read_num: 0,  // 测试模式不显示虚假阅读量
+              like_num: 0,
+              comment_num: 0,
+              share_num: 0
             }
           }]
         }
       };
     }
     
+    // 对于真实的msgId，始终调用真实的微信API
     const accessToken = await this.getAccessToken();
+    logger.debug('获取到access_token，准备查询状态', { tokenLength: accessToken.length });
     
     try {
+      logger.debug('调用微信API查询发布状态', { 
+        msgId, 
+        api: 'freepublish/get' 
+      });
+      
       const response = await axios.post(
         `https://api.weixin.qq.com/cgi-bin/freepublish/get?access_token=${accessToken}`,
         { publish_id: msgId },
-        { timeout: 10000 }
+        { timeout: 15000 }
       );
 
+      logger.debug('微信API响应', { 
+        errcode: response.data.errcode,
+        errmsg: response.data.errmsg,
+        hasArticleDetail: !!response.data.article_detail
+      });
+
       if (response.data.errcode === 0) {
+        logger.info('状态查询成功', { 
+          msgId,
+          status: response.data.publish_status,
+          articleCount: response.data.article_detail?.count || 0
+        });
         return response.data;
       } else {
-        throw new Error(`查询发布状态失败: ${response.data.errmsg}`);
+        // 如果是文章不存在或权限问题，返回更友好的错误信息
+        if (response.data.errcode === 40007) {
+          throw new Error(`文章不存在或已被删除 (错误码: ${response.data.errcode})`);
+        } else if (response.data.errcode === 40001) {
+          throw new Error(`access_token无效，请检查AppID和AppSecret (错误码: ${response.data.errcode})`);
+        } else {
+          throw new Error(`查询发布状态失败: ${response.data.errmsg} (错误码: ${response.data.errcode})`);
+        }
       }
     } catch (error) {
+      logger.error('状态查询失败', { 
+        msgId,
+        error: error.message,
+        isAxiosError: !!error.response
+      });
+      
       if (error.response) {
         const errorData = error.response.data;
-        throw new Error(`查询发布状态失败: ${errorData.errmsg || error.message}`);
+        throw new Error(`微信API调用失败: ${errorData.errmsg || error.message} (HTTP状态: ${error.response.status})`);
+      } else if (error.code === 'ECONNABORTED') {
+        throw new Error('请求超时，请检查网络连接后重试');
       } else {
-        throw new Error(`查询发布状态请求失败: ${error.message}`);
+        throw new Error(`网络请求失败: ${error.message}`);
       }
     }
   }

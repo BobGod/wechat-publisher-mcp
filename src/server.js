@@ -27,7 +27,6 @@ const server = new McpServer({
 server.registerTool(
   "wechat_publish_article",
   {
-    title: "微信公众号发布工具",
     description: "将文章发布到微信公众号，支持Markdown格式",
     inputSchema: {
       title: z.string().describe("文章标题"),
@@ -36,7 +35,7 @@ server.registerTool(
       appId: z.string().describe("微信公众号AppID"),
       appSecret: z.string().describe("微信公众号AppSecret"),
       coverImagePath: z.string().optional().describe("封面图片路径"),
-      previewMode: z.boolean().optional().default(false).describe("是否为预览模式"),
+      previewMode: z.boolean().default(false).describe("是否为预览模式"),
       previewOpenId: z.string().optional().describe("预览用户OpenID")
     }
   },
@@ -75,7 +74,6 @@ server.registerTool(
 server.registerTool(
   "wechat_query_status",
   {
-    title: "微信文章状态查询",
     description: "查询文章发布状态和统计数据",
     inputSchema: {
       msgId: z.string().describe("消息ID"),
@@ -108,6 +106,8 @@ server.registerTool(
     }
   }
 );
+
+
 
 logger.info('WeChat Publisher MCP Server initialized');
 

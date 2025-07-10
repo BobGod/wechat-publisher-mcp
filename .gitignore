@@ -142,11 +142,26 @@ wechat-config.json
 # Test files with real credentials
 test-*.js
 check-*.js
+publish-*.js
+simulate-*.js
+direct-test.js
+final-test.js
+minimal-test.js
+simple-test.js
 
 # Auto-generated cover images
 auto-cover-*.png
 auto-cover-*.svg
 temp-cover.*
+
+# Temporary article files
+article-part*.md
+complete-article.md
+original-article-modified.md
+simplified-article.md
+final-article.md
+simple-article.md
+publish-record-*.json
 
 # Build artifacts
 build/
