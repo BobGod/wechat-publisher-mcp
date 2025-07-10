@@ -5,8 +5,13 @@
  * 启动MCP服务器，提供微信公众号文章发布和状态查询功能
  */
 
-const path = require('path');
-const logger = require('./utils/logger.js');
+import path from 'path';
+import logger from './utils/logger.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 设置进程标题
 process.title = 'wechat-publisher-mcp';
@@ -43,14 +48,15 @@ process.on('SIGTERM', () => {
 // 启动服务器
 async function main() {
   try {
+    const packageJson = JSON.parse(readFileSync(path.join(__dirname, '../package.json'), 'utf8'));
     logger.info('Starting WeChat Publisher MCP Service...', {
-      version: require('../package.json').version,
+      version: packageJson.version,
       nodeVersion: process.version,
       platform: process.platform
     });
 
     // 导入并启动服务器
-    const WeChatMCPServer = require('./server.js');
+    const { default: WeChatMCPServer } = await import('./server.js');
     const server = new WeChatMCPServer();
     
     await server.start();
@@ -70,8 +76,8 @@ async function main() {
 }
 
 // 如果是直接执行此文件，则启动服务
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { main }; 
+export { main };

@@ -17,6 +17,21 @@ class WeChatPublisher {
     const startTime = Date.now();
     
     try {
+      // 详细记录调用参数（隐藏敏感信息）
+      const logParams = {
+        title: params.title,
+        author: params.author,
+        contentLength: params.content ? params.content.length : 0,
+        contentPreview: params.content ? params.content.substring(0, 100) + '...' : '',
+        appId: params.appId ? params.appId.substring(0, 8) + '***' : 'undefined',
+        appSecret: params.appSecret ? '***已提供***' : 'undefined',
+        coverImagePath: params.coverImagePath || 'undefined',
+        previewMode: params.previewMode || false,
+        previewOpenId: params.previewOpenId || 'undefined'
+      };
+      
+      logger.info('=== MCP调用开始 ===');
+      logger.info('调用参数详情', logParams);
       logger.info('开始发布流程', { title: params.title });
       
       // 1. 参数验证

@@ -138,4 +138,23 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   });
 }
 
-export default server;
+// 包装类
+class WeChatMCPServer {
+  constructor() {
+    this.server = server;
+  }
+  
+  async start() {
+    try {
+      const transport = new StdioServerTransport();
+      await this.server.connect(transport);
+      logger.info('WeChat Publisher MCP Server connected via stdio');
+      return this.server;
+    } catch (error) {
+      logger.error('Failed to start server', error);
+      throw error;
+    }
+  }
+}
+
+export default WeChatMCPServer;
