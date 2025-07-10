@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "微信公众号自动发布MCP服务 - 支持任何AI工具调用，实现智能内容发布",
   "main": "src/index.js",
+  "type": "commonjs",
   "bin": {
     "wechat-publisher-mcp": "src/server.js"
   },
   "scripts": {
     "start": "node src/server.js",
+    "start:http": "MCP_TRANSPORT=http node src/server.js",
     "dev": "node --inspect src/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -30,26 +32,28 @@
     "social-media"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com",
-    "url": "https://github.com/your-username"
+    "name": "Deepractice",
+    "email": "contact@deepractice.com",
+    "url": "https://github.com/Deepractice"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/wechat-publisher-mcp.git"
+    "url": "https://github.com/Deepractice/PromptX.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/wechat-publisher-mcp/issues"
+    "url": "https://github.com/Deepractice/PromptX/issues"
   },
-  "homepage": "https://github.com/your-username/wechat-publisher-mcp#readme",
+  "homepage": "https://github.com/Deepractice/PromptX#readme",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
     "axios": "^1.6.0",
+    "express": "^4.18.2",
     "form-data": "^4.0.0",
+    "marked": "^11.1.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
