@@ -139,6 +139,15 @@ config/production.json
 .secrets
 wechat-config.json
 
+# Test files with real credentials
+test-*.js
+check-*.js
+
+# Auto-generated cover images
+auto-cover-*.png
+auto-cover-*.svg
+temp-cover.*
+
 # Build artifacts
 build/
 dist/
@@ -146,4 +155,4 @@ lib/
 
 # Package files
 *.tgz
-*.tar.gz 
+*.tar.gz

@@ -52,12 +52,45 @@ cd wechat-publisher-mcp
 # 2. 安装依赖
 npm install
 
-# 3. 创建全局链接
+# 3. 配置微信公众号密钥
+# ⚠️ 重要安全提示：请勿将真实的AppID和AppSecret提交到代码仓库！
+cp examples/wechat-config.example.js examples/wechat-config.js
+# 编辑 examples/wechat-config.js，填入您的真实密钥
+
+# 4. 创建全局链接
 npm link
 
-# 4. 验证安装
+# 5. 验证安装
 wechat-publisher-mcp --help
 ```
+
+### 安全配置说明
+
+**⚠️ 重要：为了保护您的微信公众号安全，请务必正确配置密钥！**
+
+1. **复制配置示例文件**：
+```bash
+cp examples/wechat-config.example.js examples/wechat-config.js
+```
+
+2. **编辑配置文件**，填入您的真实密钥：
+```javascript
+// examples/wechat-config.js
+export const wechatConfig = {
+  appId: 'your_real_appid_here',        // 替换为您的真实AppID
+  appSecret: 'your_real_appsecret_here' // 替换为您的真实AppSecret
+};
+```
+
+3. **在代码中引用配置**：
+```javascript
+import { wechatConfig } from './examples/wechat-config.js';
+const { appId, appSecret } = wechatConfig;
+```
+
+4. **确保配置文件不被提交**：
+   - `examples/wechat-config.js` 已添加到 `.gitignore`
+   - 只有示例文件 `examples/wechat-config.example.js` 会被提交到仓库
 
 ### 方式二：直接运行
 
@@ -515,8 +548,8 @@ A: 可以通过微信公众号的用户管理功能获取，或者先不使用�
 在AI工具中说："请发布这篇文章到微信公众号"，并提供：
 - 标题：🔥 AI赋能Chrome扩展开发：从PromptX到功能实现的全流程实战教程
 - 作者：郑伟 | PromptX技术  
-- AppID：wxe576047557b63353
-- AppSecret：58cdb363cf9ed63942b8e124890a8c18
+- AppID：your_wechat_appid_here（请替换为您的真实AppID）
+- AppSecret：your_wechat_appsecret_here（请替换为您的真实AppSecret）
 - 封面图：./cover.png
 - 内容：[Markdown内容]
 

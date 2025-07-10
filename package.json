@@ -2,8 +2,8 @@
   "name": "wechat-publisher-mcp",
   "version": "1.0.0",
   "description": "微信公众号自动发布MCP服务 - 支持任何AI工具调用，实现智能内容发布",
-  "main": "src/index.js",
   "type": "module",
+  "main": "src/index.js",
   "bin": {
     "wechat-publisher-mcp": "src/server.js"
   },
@@ -45,7 +45,10 @@
   "homepage": "https://github.com/Deepractice/PromptX#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
+    "axios": "^1.10.0",
+    "canvas": "^3.1.2",
     "express": "^4.18.2",
+    "form-data": "^4.0.3",
     "winston": "^3.11.0",
     "zod": "^3.25.76"
   },

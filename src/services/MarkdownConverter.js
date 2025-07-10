@@ -322,4 +322,4 @@ hr {
   }
 }
 
-module.exports = MarkdownConverter; 
+export default MarkdownConverter;

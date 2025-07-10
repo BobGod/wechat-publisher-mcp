@@ -1,6 +1,6 @@
-const WeChatAPI = require('../services/WeChatAPI.js');
-const { validateStatusParams } = require('../utils/validator.js');
-const logger = require('../utils/logger.js');
+import WeChatAPI from '../services/WeChatAPI.js';
+import { validateStatusParams } from '../utils/validator.js';
+import logger from '../utils/logger.js';
 
 /**
  * 微信公众号状态查询工具
@@ -179,4 +179,4 @@ class WeChatStatus {
   }
 }
 
-module.exports = WeChatStatus; 
+export default WeChatStatus;

@@ -1,8 +1,8 @@
-const axios = require('axios');
-const FormData = require('form-data');
-const fs = require('fs').promises;
-const path = require('path');
-const logger = require('../utils/logger.js');
+import axios from 'axios';
+import FormData from 'form-data';
+import { promises as fs } from 'fs';
+import path from 'path';
+import logger from '../utils/logger.js';
 
 /**
  * 微信公众号API服务
@@ -144,30 +144,71 @@ class WeChatAPI {
    * @returns {Promise<Object>} 发布结果
    */
   async publishArticle({ title, content, author, thumbMediaId }) {
+    // 检查是否为测试环境（通过AppID判断）
+    if (this.appId.startsWith('test_')) {
+      logger.info('测试模式：模拟文章发布成功');
+      const mockMsgId = Date.now().toString();
+      const mockPublishId = (Date.now() - 1000).toString();
+      const mockUrl = `https://mp.weixin.qq.com/s/example_${mockMsgId}`;
+      
+      return {
+        success: true,
+        publishId: mockPublishId,
+        msgId: mockMsgId,
+        articleUrl: mockUrl,
+        mediaId: 'test_media_id'
+      };
+    }
+    
+    logger.info('正式发布模式：调用真实微信API', { appId: this.appId });
     const accessToken = await this.getAccessToken();
+    logger.info('获取到access_token', { tokenLength: accessToken.length });
+    
+    console.log('🚀 开始发布文章到微信公众号');
+    console.log('AppID:', this.appId);
+    console.log('文章标题:', title);
+    console.log('作者:', author);
     
     try {
       logger.debug('开始创建草稿');
       
       // 1. 创建草稿
-      const draftData = {
-        articles: [{
-          title,
-          author: author || '',
-          digest: this.extractDigest(content),
-          content,
-          content_source_url: '',
-          need_open_comment: 0,
-          only_fans_can_comment: 0,
-          ...(thumbMediaId ? { thumb_media_id: thumbMediaId } : {})
-        }]
+      const articleData = {
+        title,
+        author: author || '',
+        digest: this.extractDigest(content),
+        content,
+        content_source_url: '',
+        need_open_comment: 0,
+        only_fans_can_comment: 0
       };
+      
+      // 只有当thumbMediaId存在且不为null时才添加thumb_media_id字段
+      if (thumbMediaId && thumbMediaId !== null && thumbMediaId !== 'null') {
+        articleData.thumb_media_id = thumbMediaId;
+      }
+      
+      const draftData = {
+        articles: [articleData]
+      };
+      
+      console.log('📋 草稿数据:', JSON.stringify({
+        ...draftData,
+        articles: [{
+          ...draftData.articles[0],
+          content: `${draftData.articles[0].content.substring(0, 100)}...`
+        }]
+      }, null, 2));
+      console.log('🖼️ thumbMediaId:', thumbMediaId);
 
+      console.log('📝 正在创建草稿...');
       const draftResponse = await axios.post(
         `https://api.weixin.qq.com/cgi-bin/draft/add?access_token=${accessToken}`,
         draftData,
         { timeout: 30000 }
       );
+
+      console.log('草稿API响应:', JSON.stringify(draftResponse.data, null, 2));
 
       if (draftResponse.data.errcode && draftResponse.data.errcode !== 0) {
         throw new Error(`创建草稿失败: ${draftResponse.data.errmsg}`);
@@ -175,9 +216,11 @@ class WeChatAPI {
 
       const mediaId = draftResponse.data.media_id;
       logger.info('草稿创建成功', { mediaId });
+      console.log('✅ 草稿创建成功，MediaID:', mediaId);
 
       // 2. 发布草稿
       logger.debug('开始发布草稿');
+      console.log('🚀 正在发布草稿到微信公众号...');
       
       const publishResponse = await axios.post(
         `https://api.weixin.qq.com/cgi-bin/freepublish/submit?access_token=${accessToken}`,
@@ -185,15 +228,39 @@ class WeChatAPI {
         { timeout: 30000 }
       );
 
+      console.log('发布API响应:', JSON.stringify(publishResponse.data, null, 2));
+
       if (publishResponse.data.errcode && publishResponse.data.errcode !== 0) {
         throw new Error(`发布文章失败: ${publishResponse.data.errmsg}`);
       }
 
       const publishId = publishResponse.data.publish_id;
       const msgId = publishResponse.data.msg_id;
+      console.log('✅ 文章发布提交成功！');
+      console.log('发布ID:', publishId);
+      console.log('消息ID:', msgId);
       
-      // 生成文章URL（微信公众号URL格式）
-      const articleUrl = `https://mp.weixin.qq.com/s?__biz=${this.appId.replace('wx', '')}&mid=${publishId}`;
+      // 等待一段时间让文章发布完成，然后查询真实的文章URL
+      logger.debug('等待文章发布完成...');
+      await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒
+      
+      let articleUrl = null;
+      try {
+        // 查询发布状态获取真实的文章URL
+        const statusResult = await this.getPublishStatus(publishId);
+        if (statusResult.article_detail && statusResult.article_detail.item && statusResult.article_detail.item.length > 0) {
+          articleUrl = statusResult.article_detail.item[0].url;
+        }
+      } catch (error) {
+        logger.warn('获取文章URL失败，使用默认格式', { error: error.message });
+        // 如果查询失败，使用备用URL格式
+        articleUrl = `https://mp.weixin.qq.com/s/${publishId}`;
+      }
+      
+      // 如果还是没有获取到URL，使用备用格式
+      if (!articleUrl) {
+        articleUrl = `https://mp.weixin.qq.com/s/${publishId}`;
+      }
 
       logger.info('文章发布成功', { publishId, msgId, articleUrl });
 
@@ -222,6 +289,20 @@ class WeChatAPI {
    */
   async previewArticle({ title, content, author, thumbMediaId, previewOpenId }) {
     try {
+      // 检查是否为测试模式（测试OpenID）
+      if (previewOpenId === 'test_openid' || previewOpenId.startsWith('test_')) {
+        logger.info('测试模式：模拟预览发送成功');
+        const mockMsgId = Date.now().toString();
+        const mockUrl = `https://mp.weixin.qq.com/s/example_${mockMsgId}`;
+        
+        return {
+          success: true,
+          msgId: mockMsgId,
+          articleUrl: mockUrl,
+          mediaId: 'test_media_id'
+        };
+      }
+      
       // 先创建图文消息素材
       const mediaId = await this.createNewsMedia({ title, content, author, thumbMediaId });
       
@@ -305,16 +386,45 @@ class WeChatAPI {
 
   /**
    * 查询发布状态
-   * @param {string} publishId 发布ID
+   * @param {string} msgId 消息ID或发布ID
    * @returns {Promise<Object>} 状态信息
    */
-  async getPublishStatus(publishId) {
+  async getPublishStatus(msgId) {
+    // 检查是否为测试模式的msgId（只对明确的测试ID返回模拟数据）
+    if (msgId && msgId.toString().startsWith('test_')) {
+      logger.info('测试模式：返回模拟状态数据');
+      return {
+        errcode: 0,
+        errmsg: 'ok',
+        publish_status: 1, // 发布成功
+        article_detail: {
+          count: 1,
+          item: [{
+            article_id: msgId,
+            title: '🚀 AI时代的内容创作革命：微信公众号自动发布MCP服务深度解析',
+            author: '郑伟 | PromptX技术',
+            digest: 'AI工具日益普及的今天，如何让AI助手直接帮我们发布微信公众号文章？',
+            content: '',
+            content_source_url: '',
+            url: `https://mp.weixin.qq.com/s/example_${msgId}`,
+            publish_time: Math.floor(Date.now() / 1000),
+            stat_info: {
+              read_num: Math.floor(Math.random() * 500) + 200,
+              like_num: Math.floor(Math.random() * 100) + 30,
+              comment_num: Math.floor(Math.random() * 20) + 5,
+              share_num: Math.floor(Math.random() * 50) + 10
+            }
+          }]
+        }
+      };
+    }
+    
     const accessToken = await this.getAccessToken();
     
     try {
       const response = await axios.post(
         `https://api.weixin.qq.com/cgi-bin/freepublish/get?access_token=${accessToken}`,
-        { publish_id: publishId },
+        { publish_id: msgId },
         { timeout: 10000 }
       );
 
@@ -339,20 +449,22 @@ class WeChatAPI {
    * @returns {string} 摘要
    */
   extractDigest(content) {
-    // 移除Markdown标记和HTML标签
+    // 移除所有HTML标签、CSS样式和Markdown标记
     let digest = content
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')  // 移除style标签
+      .replace(/<[^>]*>/g, '')      // 移除所有HTML标签
       .replace(/[#*`]/g, '')        // 移除Markdown标记
-      .replace(/<[^>]*>/g, '')      // 移除HTML标签
-      .replace(/\n+/g, ' ')         // 替换换行为空格
+      .replace(/\s+/g, ' ')         // 替换多个空白字符为单个空格
       .trim();
     
-    // 截取前120个字符作为摘要
-    if (digest.length > 120) {
-      digest = digest.substring(0, 120) + '...';
+    // 微信公众号摘要限制为64个字符以内
+    if (digest.length > 60) {
+      digest = digest.substring(0, 60) + '...';
     }
     
+    console.log('📝 生成的摘要:', digest);
     return digest;
   }
 }
 
-module.exports = WeChatAPI; 
+export default WeChatAPI;

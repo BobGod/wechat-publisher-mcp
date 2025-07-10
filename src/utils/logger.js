@@ -22,7 +22,11 @@ const logger = {
     if (process.env.DEBUG) {
       console.log(`[DEBUG] ${message}`, ...args);
     }
+  },
+  
+  warn: (message, ...args) => {
+    console.warn(`[WARN] ${message}`, ...args);
   }
 };
 
-module.exports = logger; 
+export default logger;

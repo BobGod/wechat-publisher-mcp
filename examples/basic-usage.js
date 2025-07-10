@@ -13,8 +13,8 @@ const WeChatStatus = require('../src/tools/wechat-status.js');
 
 // 示例配置（请替换为您的实际配置）
 const config = {
-  appId: 'wxe576047557b63353',  // 替换为您的AppID
-  appSecret: '58cdb363cf9ed63942b8e124890a8c18',  // 替换为您的AppSecret
+  appId: 'your_wechat_appid_here',  // 替换为您的AppID
+  appSecret: 'your_wechat_appsecret_here',  // 替换为您的AppSecret
   // previewOpenId: 'your_preview_openid_here'  // 预览模式需要
 };
 
@@ -227,4 +227,4 @@ module.exports = {
   example2_previewMode,
   example3_queryStatus,
   example4_withCoverImage
-}; 
+};

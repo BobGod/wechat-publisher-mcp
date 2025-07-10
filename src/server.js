@@ -4,6 +4,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { z } from 'zod';
+import WeChatPublisher from './tools/wechat-publisher.js';
+import WeChatStatus from './tools/wechat-status.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,25 +45,19 @@ server.registerTool(
     logger.info(`Publishing article: ${title}`);
     
     try {
-      // 这里应该调用实际的发布逻辑
-      const result = {
-        success: true,
-        message: previewMode ? '文章预览发送成功' : '文章发布成功',
-        data: {
-          title,
-          author,
-          previewMode,
-          publishId: Date.now().toString(),
-          articleUrl: `https://mp.weixin.qq.com/s/example_${Date.now()}`
-        }
-      };
+      // 调用实际的发布逻辑
+      const result = await WeChatPublisher.publish({
+        title,
+        content,
+        author,
+        appId,
+        appSecret,
+        coverImagePath,
+        previewMode,
+        previewOpenId
+      });
       
-      return {
-        content: [{
-          type: "text",
-          text: `✅ ${result.message}\n\n📱 标题: ${title}\n👤 作者: ${author}\n🔗 链接: ${result.data.articleUrl}\n📊 发布ID: ${result.data.publishId}`
-        }]
-      };
+      return result;
     } catch (error) {
       logger.error(`发布失败: ${error.message}`);
       return {
@@ -92,21 +88,14 @@ server.registerTool(
     logger.info(`Querying status for message: ${msgId}`);
     
     try {
-      // 这里应该调用实际的查询逻辑
-      const result = {
-        success: true,
-        status: 'published',
+      // 调用实际的查询逻辑
+      const result = await WeChatStatus.query({
         msgId,
-        readCount: Math.floor(Math.random() * 1000) + 100,
-        likeCount: Math.floor(Math.random() * 50) + 10
-      };
+        appId,
+        appSecret
+      });
       
-      return {
-        content: [{
-          type: "text",
-          text: `📊 文章状态查询结果\n\n📨 消息ID: ${msgId}\n📈 状态: ${result.status}\n👀 阅读量: ${result.readCount}\n❤️ 点赞数: ${result.likeCount}`
-        }]
-      };
+      return result;
     } catch (error) {
       logger.error(`查询失败: ${error.message}`);
       return {
