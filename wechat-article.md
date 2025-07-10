@@ -80,7 +80,7 @@ AI就会自动：
 node --version
 
 # 克隆项目
-git clone https://github.com/your-username/wechat-publisher-mcp.git
+git clone https://github.com/BobGod/wechat-publisher-mcp.git
 cd wechat-publisher-mcp
 
 # 安装依赖
@@ -153,19 +153,28 @@ AppSecret：你的微信AppSecret
 **测试成功！** 🎉
 ```
 
-## 💡 实际应用场景
+## 💡 实际应用场景：专为开发者量身定制
+
+### 🧑‍💻 AI辅助学习与分享
+
+作为开发者，我们经常使用AI工具来学习新技术、解决问题或完成项目。现在，你可以：
+
+- **📚 学习总结**：用Claude学习新框架后，直接让AI总结学习要点并发布技术心得
+- **🔧 问题解决**：用AI工具解决技术难题后，一键分享解决方案和思路
+- **💡 项目复盘**：完成项目开发后，让AI帮你总结技术亮点并发布项目介绍
+- **📖 代码解析**：分析开源项目时，直接让AI整理分析结果并分享给社区
 
 ### 📝 技术博客作者
 
-"我用Cursor写完技术文章后，直接让AI帮我发布到公众号，省去了复制粘贴和格式调整的麻烦。"
+"我用Cursor写完技术文章后，直接让AI帮我发布到公众号，省去了复制粘贴和格式调整的麻烦。从写作到发布，全程AI协助，效率提升了300%！"
 
-### 🎬 内容创作团队
+### 🎓 技术培训师
 
-"团队成员用Claude写好文案，AI自动处理发布流程，大大提升了内容产出效率。"
+"准备技术培训材料时，我会先用AI工具整理知识点，然后直接让AI发布到公众号作为预习资料。学员反馈说内容结构清晰，易于理解。"
 
-### 🏢 企业技术分享
+### 🏢 企业技术团队
 
-"公司技术分享会的内容，现在可以一键同步到公众号，让更多人看到我们的技术实践。"
+"团队技术分享会后，我们用AI总结分享内容的核心要点，然后一键发布到公司技术公众号。这样不仅记录了团队的技术成长，也让更多同事受益。"
 
 ## 🔮 未来展望：AI内容生态的无限可能
 
@@ -196,7 +205,7 @@ AppSecret：你的微信AppSecret
 
 ### 技术交流
 
-- **GitHub仓库**：[wechat-publisher-mcp](https://github.com/your-username/wechat-publisher-mcp)
+- **GitHub仓库**：[wechat-publisher-mcp](https://github.com/BobGod/wechat-publisher-mcp)
 - **技术文档**：完整的API文档和架构说明
 - **社区讨论**：Issues区域活跃的技术讨论
 
@@ -219,7 +228,7 @@ AppSecret：你的微信AppSecret
 
 想要体验AI自动发布微信公众号的神奇魅力吗？
 
-👉 **GitHub仓库**：[点击访问](https://github.com/your-username/wechat-publisher-mcp)  
+👉 **GitHub仓库**：[点击访问](https://github.com/BobGod/wechat-publisher-mcp)  
 👉 **快速开始**：按照README文档5分钟完成配置  
 👉 **技术交流**：欢迎在Issues区域讨论交流  
 
